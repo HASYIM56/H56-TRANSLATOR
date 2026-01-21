@@ -1,0 +1,46 @@
+{
+  "name": "h56-translator",
+  "version": "1.0.6",
+  "description": "Simple translator wrapper for h56-translator-api",
+  "main": "translate.js",
+  "bin": {
+    "h56-translator": "info/info.js"
+  },
+  "keywords": [
+    "translator",
+    "translate",
+    "api",
+    "h56",
+    "npm",
+    "translatorservice",
+    "hasyim56",
+    "HASYIM56"
+  ],
+  "author": {
+    "name": "Muhammad Ali Hasyim",
+    "email": "m.aliahasyim1802@gmail.com",
+    "url": "https://github.com/HASYIM56"
+  },
+  "contributors": [
+    {
+      "name": "HASYIM56",
+      "url": "https://github.com/HASYIM56"
+    }
+  ],
+  "homepage": "https://github.com/HASYIM56",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HASYIM56/h56-translator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HASYIM56/h56-translator/issues"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://youtube.com/@HASYIM56"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
