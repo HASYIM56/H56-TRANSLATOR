@@ -1,6 +1,6 @@
 {
   "name": "h56-translator",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Simple translator wrapper for h56-translator-api",
   "main": "translate.js",
   "bin": {
