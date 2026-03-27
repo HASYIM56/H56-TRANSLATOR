@@ -1,56 +1,145 @@
-'use strict';
+/**
+ * translate.js
+ *
+ * Translate text to target language using remote API (v1 & v2).
+ * - Validates input
+ * - Validates that targetLang exists in supported languages list
+ * - v1: Standard formal translation
+ * - v2: Relaxed, informal translation with natural expressions
+ * - Preserves existing v1 logic while extending v2 capabilities
+ *
+ * Note: This module exports:
+ *   module.exports = { translate, translateV2, supportedLanguages }
+ *
+ */
 
-const abortController = require('abort-controller');
+const API_URL = "https://h56-translator-api.vercel.app/api/translate";
+const API_URL_V2 = "https://h56-translator-api.vercel.app/api/translate/v2";
+const { supportedLanguages } = require("./listlang/listlang");
+
+// Use global fetch when available (Node 18+ / browsers), otherwise try node-fetch as fallback
+let fetchImpl = (typeof fetch !== "undefined") ? fetch : null;
+if (!fetchImpl) {
+  try {
+    // node-fetch v3 is ESM-only; in CommonJS contexts this may fail.
+    // Many users run Node >= 18 so global fetch exists. This is a best-effort fallback.
+    // If fallback fails, an error will surface when calling translate.
+    // eslint-disable-next-line global-require
+    fetchImpl = require("node-fetch");
+  } catch (err) {
+    // leave fetchImpl null; calling code will fail with a clear error if fetch is absent
+  }
+}
 
 /**
- * Translate text from one language to another.
- * @param {string} text - The text to translate.
- * @param {string} targetLang - The target language for translation.
- * @returns {Promise<any>} - The response from the translation API.
+ * Validate and normalize language parameter
+ * @param {string} targetLang - Target language code or language name (case-insensitive)
+ * @returns {Object} Found language object from supportedLanguages
+ * @throws {Error} If language is not found
  */
-const translate = async (text, targetLang) => {
-    // existing logic here
-};
+function validateAndNormalizeLang(targetLang) {
+  const normalized = String(targetLang).trim().toLowerCase();
+
+  const found = supportedLanguages.find((l) => {
+    return l.code.toLowerCase() === normalized || l.name.toLowerCase() === normalized;
+  });
+
+  if (!found) {
+    throw new Error("bahasa respon tidak didukung atau tidak ada");
+  }
+
+  return found;
+}
 
 /**
- * Translate text from one language to another with options.
- * @param {string} text - The text to translate.
- * @param {string} targetLang - The target language for translation.
- * @param {Object} options - The options for the translation request.
- * @param {AbortSignal} options.signal - An AbortSignal to cancel the request.
- * @param {number} [options.timeoutMs] - Timeout in milliseconds.
- * @returns {Promise<any>} - The response from the translation API.
+ * Perform HTTP request to translation API
+ * @param {string} url - API endpoint URL
+ * @param {Object} payload - Request payload (text, targetLang)
+ * @returns {Promise<Object>} Response JSON from translation API
+ * @throws {Error} If fetch is unavailable or API returns non-ok status
  */
-const translateV2 = async (text, targetLang, options = {}) => {
-    // Validate input
-    if (typeof text !== 'string' || typeof targetLang !== 'string') {
-        throw new Error('Invalid input types');
-    }
+async function performTranslationRequest(url, payload) {
+  if (!fetchImpl) {
+    throw new Error(
+      "fetch is not available in this environment. Please provide a global fetch or install 'node-fetch'."
+    );
+  }
 
-    const controller = new AbortController();
-    const timeoutId = options.timeoutMs ? setTimeout(() => controller.abort(), options.timeoutMs) : null;
+  const res = await fetchImpl(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    try {
-        const response = await fetch('https://h56-translator-api.vercel.app/api/translate/v2', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            signal: options.signal || controller.signal,
-            body: JSON.stringify({ text, targetLang }),
-        });
+  if (!res.ok) {
+    throw new Error(`API error: ${res.status}`);
+  }
 
-        return await response.json();
-    } catch (error) {
-        if (error.name === 'AbortError') {
-            throw new Error('Request timed out');
-        }
-        throw error;
-    } finally {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
-    }
+  return res.json();
+}
+
+/**
+ * Translate text to target language (v1 - Standard)
+ * @param {string} text - Text to translate
+ * @param {string} targetLang - Target language code or language name (case-insensitive)
+ * @returns {Promise<Object>} Response JSON from translation API with translatedText, sourceLang, targetLang, serviceStatus
+ * @throws {Error} If inputs are invalid or API returns non-ok status or language unsupported
+ *
+ * @example
+ * const { translate } = require('h56-translator');
+ * const result = await translate('Halo dunia', 'en');
+ * console.log(result.translatedText); // => "Hello world"
+ */
+async function translate(text, targetLang) {
+  if (!text || !targetLang) {
+    throw new Error("text dan targetLang wajib diisi");
+  }
+
+  const found = validateAndNormalizeLang(targetLang);
+
+  const payload = {
+    text,
+    targetLang: found.code,
+  };
+
+  return performTranslationRequest(API_URL, payload);
+}
+
+/**
+ * Translate text to target language (v2 - Informal)
+ *
+ * v2 delivers relaxed, informal translations with natural expressions
+ * that reflect everyday language usage and cultural context in the target language.
+ *
+ * @param {string} text - Text to translate
+ * @param {string} targetLang - Target language code or language name (case-insensitive)
+ * @returns {Promise<Object>} Response JSON from v2 API with translatedText, sourceLang, targetLang, serviceStatus
+ * @throws {Error} If inputs are invalid or API returns non-ok status or language unsupported
+ *
+ * @example
+ * const { translateV2 } = require('h56-translator');
+ * const result = await translateV2('Apa kabar?', 'en');
+ * console.log(result.translatedText); // => "What's up?" or "How you doing?"
+ */
+async function translateV2(text, targetLang) {
+  if (!text || !targetLang) {
+    throw new Error("text dan targetLang wajib diisi");
+  }
+
+  const found = validateAndNormalizeLang(targetLang);
+
+  const payload = {
+    text,
+    targetLang: found.code,
+  };
+
+  return performTranslationRequest(API_URL_V2, payload);
+}
+
+module.exports = {
+  translate,
+  translateV2,
+  supportedLanguages,
 };
-
-module.exports = { translate, translateV2, supportedLanguages };
