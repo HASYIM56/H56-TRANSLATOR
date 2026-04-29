@@ -353,4 +353,8 @@ MIT © Muhammad Ali Hasyim
 
 **Repository:** https://github.com/HASYIM56/h56-translator  
 **Issues:** https://github.com/HASYIM56/h56-translator/issues  
+<<<<<<< HEAD
 **Author:** [HASYIM56](https://github.com/HASYIM56)
+=======
+**Author:** [HASYIM56](https://github.com/HASYIM56)
+>>>>>>> 0901abc (update)
