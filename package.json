@@ -1,10 +1,26 @@
 {
   "name": "h56-translator",
-  "version": "1.0.7",
-  "description": "Simple translator wrapper for h56-translator-api",
+  "version": "1.0.8",
+  "description": "A simple and modern translator wrapper for h56-translator-api with CLI support and online documentation.",
   "main": "translate.js",
+  "type": "commonjs",
+  "exports": {
+    ".": "./translate.js"
+  },
   "bin": {
     "h56-translator": "info/info.js"
+  },
+  "files": [
+    "translate.js",
+    "info/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node translate.js",
+    "cli": "node info/info.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "docs": "echo \"Open docs at https://h56-translator-web-docs.netlify.app/\""
   },
   "keywords": [
     "translator",
@@ -14,7 +30,11 @@
     "npm",
     "translatorservice",
     "hasyim56",
-    "HASYIM56"
+    "language",
+    "cli",
+    "translation",
+    "wrapper",
+    "nodejs"
   ],
   "author": {
     "name": "Muhammad Ali Hasyim",
@@ -27,7 +47,7 @@
       "url": "https://github.com/HASYIM56"
     }
   ],
-  "homepage": "https://github.com/HASYIM56",
+  "homepage": "https://github.com/HASYIM56/h56-translator",
   "repository": {
     "type": "git",
     "url": "https://github.com/HASYIM56/h56-translator.git"
@@ -42,5 +62,18 @@
   "license": "MIT",
   "engines": {
     "node": ">=18"
+  },
+  "docs": {
+    "web": "https://h56-translator-web-docs.netlify.app/",
+    "github": "https://github.com/HASYIM56/h56-translator",
+    "api_reference": "https://h56-translator-web-docs.netlify.app/api",
+    "examples": "https://h56-translator-web-docs.netlify.app/examples"
+  },
+  "directories": {
+    "doc": "docs",
+    "lib": "."
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
