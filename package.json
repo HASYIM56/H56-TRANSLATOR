@@ -1,19 +1,21 @@
 {
   "name": "h56-translator",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "A simple and modern translator wrapper for h56-translator-api with CLI support and online documentation.",
   "main": "translate.js",
   "types": "index.d.ts",
   "type": "commonjs",
   "exports": {
     ".": "./translate.js",
-    "./listlang": "./listlang/listlang.js"
+    "./listlang": "./listlang/listlang.js",
+    "./mjs": "./translate.mjs"
   },
   "bin": {
     "h56-translator": "info/info.js"
   },
   "files": [
     "translate.js",
+    "translate.mjs",
     "index.d.ts",
     "listlang/",
     "info/",
